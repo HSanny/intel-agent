@@ -1,0 +1,28 @@
+{
+  "cik": 723125,
+  "entityName": "Micron Technology Inc",
+  "facts": {
+    "us-gaap": {
+      "RevenueFromContractWithCustomerExcludingAssessedTax": {
+        "label": "Revenue",
+        "units": {
+          "USD": [
+            {"end": "2023-08-31", "val": 15540000000, "fy": 2023, "fp": "FY", "form": "10-K", "filed": "2023-10-01", "accn": "a"},
+            {"end": "2023-08-31", "val": 15500000000, "fy": 2023, "fp": "FY", "form": "10-K", "filed": "2023-09-01", "accn": "b"},
+            {"end": "2022-09-01", "val": 30758000000, "fy": 2022, "fp": "FY", "form": "10-K", "filed": "2022-10-01", "accn": "c"},
+            {"end": "2023-05-31", "val": 3752000000, "fy": 2023, "fp": "Q3", "form": "10-Q", "filed": "2023-06-01", "accn": "d"}
+          ]
+        }
+      },
+      "ResearchAndDevelopmentExpense": {
+        "label": "R&D",
+        "units": {
+          "USD": [
+            {"end": "2023-08-31", "val": 3122000000, "fy": 2023, "fp": "FY", "form": "10-K", "filed": "2023-10-01", "accn": "a"},
+            {"end": "2022-09-01", "val": 3059000000, "fy": 2022, "fp": "FY", "form": "10-K", "filed": "2022-10-01", "accn": "c"}
+          ]
+        }
+      }
+    }
+  }
+}

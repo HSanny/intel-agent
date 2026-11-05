@@ -1,0 +1,26 @@
+# Example job-seeker profile (used from Milestone 4 by the Profile Matcher).
+# Milestone 1 does not read this file; it is a placeholder for the lens.
+lens: job_seeker
+
+skills:
+  - python
+  - distributed systems
+  - data engineering
+
+target_roles:
+  - backend engineer
+  - platform engineer
+
+constraints:
+  visa_sponsorship: required
+  locations:
+    - Singapore
+    - remote (APAC)
+
+preferences:
+  company_stage:
+    - public
+    - late-stage
+  values:
+    - strong R&D investment
+    - clear growth

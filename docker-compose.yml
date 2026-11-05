@@ -1,0 +1,32 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: intel-db
+    environment:
+      POSTGRES_USER: intel
+      POSTGRES_PASSWORD: intel
+      POSTGRES_DB: intel
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U intel -d intel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Milestone 4 — self-hosted Langfuse tracing. Left commented until needed.
+  # langfuse:
+  #   image: langfuse/langfuse:2
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     DATABASE_URL: postgresql://intel:intel@db:5432/intel
+  #     NEXTAUTH_SECRET: change-me
+  #     SALT: change-me
+
+volumes:
+  pgdata:
