@@ -1,0 +1,666 @@
+<title>Company Intel Decision Log</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: single ink-on-paper column — a stepper up top, then an expandable bilingual decision ledger. Dossier palette, amber accent. */
+  :root {
+    --bg: #f5f3ed;
+    --surface: #fffefb;
+    --surface-2: #ece8dd;
+    --border: #dcd6c7;
+    --fg: #1d1b16;
+    --muted: #6c6655;
+    --accent: #b0750a;
+    --accent-soft: rgba(176, 117, 10, 0.12);
+    --good: #2e7d4f;
+    --good-soft: rgba(46, 125, 79, 0.13);
+    --open: #2f6aa0;
+    --open-soft: rgba(47, 106, 160, 0.13);
+    --shadow: 0 1px 2px rgba(29, 27, 22, 0.05), 0 6px 20px rgba(29, 27, 22, 0.06);
+    --display: "Archivo", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --body: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", "PingFang SC", ui-monospace, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161b;
+      --surface: #1b1e25;
+      --surface-2: #232732;
+      --border: #313643;
+      --fg: #e9e7e1;
+      --muted: #9aa0ab;
+      --accent: #e0a73c;
+      --accent-soft: rgba(224, 167, 60, 0.15);
+      --good: #5cbd84;
+      --good-soft: rgba(92, 189, 132, 0.15);
+      --open: #5aa7e0;
+      --open-soft: rgba(90, 167, 224, 0.15);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161b;
+    --surface: #1b1e25;
+    --surface-2: #232732;
+    --border: #313643;
+    --fg: #e9e7e1;
+    --muted: #9aa0ab;
+    --accent: #e0a73c;
+    --accent-soft: rgba(224, 167, 60, 0.15);
+    --good: #5cbd84;
+    --good-soft: rgba(92, 189, 132, 0.15);
+    --open: #5aa7e0;
+    --open-soft: rgba(90, 167, 224, 0.15);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--body);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding-left: max(18px, env(safe-area-inset-left, 0px));
+    padding-right: max(18px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px;
+  }
+
+  /* bilingual helper */
+  .zh { color: var(--muted); }
+  .en { display: block; }
+  .zh.block { display: block; margin-top: 2px; }
+
+  /* ---- header ---- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.9rem, 6vw, 2.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0 0 12px;
+  }
+  .lede {
+    font-size: 1.02rem;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0 0 20px;
+  }
+  .lede .zh { display: block; margin-top: 6px; }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding-block: 12px;
+  }
+  .meta-row b { color: var(--fg); font-weight: 500; }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.28rem;
+    letter-spacing: -0.01em;
+    margin: 48px 0 6px;
+  }
+  h2 .zh { font-size: 1rem; font-weight: 500; }
+  .section-note { color: var(--muted); font-size: 0.92rem; margin: 0 0 20px; }
+  .section-note .zh { display: block; margin-top: 3px; }
+
+  /* ---- stepper ---- */
+  .stepper { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 11px;
+    box-shadow: var(--shadow);
+    position: relative;
+  }
+  .step.current { border-color: var(--accent); background: var(--accent-soft); }
+  .step .m { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+  .step.current .m { color: var(--accent); }
+  .step .t { font-size: 0.82rem; font-weight: 500; margin-top: 4px; }
+  .step .t .zh { display: block; font-size: 0.74rem; color: var(--muted); font-weight: 400; }
+  .step .s {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 8px;
+    color: var(--muted);
+  }
+  .step.current .s { color: var(--accent); font-weight: 500; }
+  .dot { color: var(--accent); }
+
+  /* ---- chips ---- */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 0.73rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 9px;
+    color: var(--fg);
+  }
+
+  /* ---- agents ---- */
+  .agents { display: grid; gap: 10px; }
+  .agent {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 14px;
+    align-items: start;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 15px;
+    box-shadow: var(--shadow);
+  }
+  .agent .name { font-weight: 600; font-family: var(--display); }
+  .agent .name .zh { font-family: var(--body); font-weight: 400; color: var(--muted); font-size: 0.85rem; margin-left: 6px; }
+  .agent .job { color: var(--muted); font-size: 0.9rem; grid-column: 1 / 2; }
+  .agent .job .zh { display: block; margin-top: 2px; }
+  .tag {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    align-self: center;
+    grid-row: 1 / 3;
+    grid-column: 2;
+  }
+  .tag.real { background: var(--good-soft); color: var(--good); }
+  .tag.border { background: var(--accent-soft); color: var(--accent); }
+  .tag.p2 { background: var(--surface-2); color: var(--muted); }
+
+  /* ---- filter ---- */
+  .filter { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter button {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .filter button:hover { color: var(--fg); border-color: var(--muted); }
+  .filter button[aria-pressed="true"] {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+  .filter button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- decision cards ---- */
+  .ledger { display: grid; gap: 14px; }
+  details.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  details.card[data-status="decided"] { border-left: 3px solid var(--good); }
+  details.card[data-status="open"] { border-left: 3px solid var(--open); }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 6px 12px;
+    align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .did {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  summary .title { font-family: var(--display); font-weight: 600; font-size: 1.02rem; min-width: 0; }
+  summary .title .zh { display: block; font-family: var(--body); font-weight: 400; font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+  summary .sub { grid-column: 2; color: var(--muted); font-size: 0.86rem; }
+  summary .sub .zh { display: block; margin-top: 1px; }
+  .status {
+    font-family: var(--mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+  .status.decided { background: var(--good-soft); color: var(--good); }
+  .status.open { background: var(--open-soft); color: var(--open); }
+  .chev { grid-row: 1 / 3; align-self: center; color: var(--muted); transition: transform 0.2s ease; font-size: 0.8rem; }
+  details[open] .chev { transform: rotate(90deg); }
+
+  .body { padding: 2px 18px 20px; border-top: 1px solid var(--border); }
+  .body h4 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 18px 0 8px;
+  }
+  .body p { margin: 0 0 10px; font-size: 0.94rem; }
+  .body p .zh { display: block; margin-top: 3px; color: var(--muted); }
+
+  .options { display: grid; gap: 10px; }
+  .opt {
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 14px;
+    background: var(--surface-2);
+  }
+  .opt.chosen { border-color: var(--good); background: var(--good-soft); }
+  .opt .oh { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+  .opt .ol { font-family: var(--mono); font-weight: 500; font-size: 0.78rem; }
+  .opt .badge {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--good);
+    color: var(--surface);
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .pc { display: grid; gap: 4px; margin-top: 6px; }
+  .pc span { font-size: 0.87rem; display: flex; gap: 7px; align-items: baseline; }
+  .pc .pro::before { content: "+"; color: var(--good); font-family: var(--mono); font-weight: 600; }
+  .pc .con::before { content: "−"; color: var(--accent); font-family: var(--mono); font-weight: 600; }
+  .pc .note::before { content: "~"; color: var(--muted); font-family: var(--mono); font-weight: 600; }
+
+  .why {
+    background: var(--accent-soft);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 0.93rem;
+    margin-top: 6px;
+  }
+  .why strong { color: var(--accent); }
+  .why .zh { display: block; margin-top: 4px; color: var(--muted); }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .empty { color: var(--muted); font-size: 0.9rem; font-style: italic; padding: 8px 2px; }
+  footer {
+    margin-top: 44px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  @media (max-width: 560px) {
+    .stepper { grid-template-columns: repeat(2, 1fr); }
+    .agent { grid-template-columns: 1fr; }
+    .tag { grid-row: auto; grid-column: auto; justify-self: start; }
+    summary { grid-template-columns: auto 1fr auto; }
+    .chev { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Project Journal · 项目决策记录</p>
+    <h1>Company Intel — Decision Log</h1>
+    <p class="lede">
+      <span class="en">A multi-agent system that researches a company from its SEC filings, financials and hiring signals, and judges it against your goals through a <b>lens</b> (a profile file). Phase 1 ships the job-seeker lens. This page records every choice we make and why.</span>
+      <span class="zh">一个多智能体系统，从公司的 SEC 文件、财务数据和招聘信号中研究一家公司，并通过一个<b>视角（lens，即一份 profile 配置文件）</b>按你自己的目标来评估它。第一阶段先做"求职者视角"。本页记录我们做出的每一个选择及其原因。</span>
+    </p>
+    <div class="meta-row">
+      <span>Started 开始 <b>3 Nov 2026</b></span>
+      <span>Updated 更新 <b>5 Nov 2026</b></span>
+      <span>Phase 阶段 <b>1 / 3</b></span>
+      <span>Code 代码: <b>none yet 尚未开始</b></span>
+    </div>
+  </header>
+
+  <h2>Where we are <span class="zh">· 当前进度</span></h2>
+  <p class="section-note">
+    <span class="en">Step zero — only the scope document exists. Agents and the LangGraph/LangChain orchestration are built at Milestone 3; Milestones 1–2 are pure data plumbing with no agents.</span>
+    <span class="zh">第零步 —— 目前只有方案文档。智能体（agents）以及 LangGraph / LangChain 编排要到里程碑 3 才会出现；里程碑 1–2 是纯数据管道，不涉及任何智能体。</span>
+  </p>
+  <div class="stepper">
+    <div class="step current">
+      <div class="m">M1</div>
+      <div class="t">Ingest &amp; store <span class="zh">采集与入库</span></div>
+      <div class="s"><span class="dot">●</span> You are here 当前</div>
+    </div>
+    <div class="step">
+      <div class="m">M2</div>
+      <div class="t">Hybrid retrieval <span class="zh">混合检索</span></div>
+      <div class="s">Planned 计划中</div>
+    </div>
+    <div class="step">
+      <div class="m">M3</div>
+      <div class="t">Agents + LangGraph <span class="zh">智能体编排</span></div>
+      <div class="s">Planned 计划中</div>
+    </div>
+    <div class="step">
+      <div class="m">M4</div>
+      <div class="t">Matcher · tracing <span class="zh">匹配·追踪</span></div>
+      <div class="s">Planned 计划中</div>
+    </div>
+    <div class="step">
+      <div class="m">M5</div>
+      <div class="t">Eval · publish <span class="zh">评估·发布</span></div>
+      <div class="s">Planned 计划中</div>
+    </div>
+  </div>
+
+  <h2>What it is <span class="zh">· 这是什么</span></h2>
+  <p class="section-note">
+    <span class="en">One research engine, swappable lenses. Trust-first: every claim carries a citation to its filing section and date.</span>
+    <span class="zh">一个研究引擎，视角可替换。信任优先：每一条结论都附带对应文件章节与日期的引用。</span>
+  </p>
+  <div class="chips">
+    <span class="chip">Python 3.11</span>
+    <span class="chip">LangGraph</span>
+    <span class="chip">LangChain</span>
+    <span class="chip">Postgres + pgvector</span>
+    <span class="chip">OpenAI / Anthropic</span>
+    <span class="chip">BM25</span>
+    <span class="chip">Reranker</span>
+    <span class="chip">FastAPI</span>
+    <span class="chip">Langfuse</span>
+    <span class="chip">Ragas</span>
+    <span class="chip">pytest</span>
+    <span class="chip">SEC EDGAR</span>
+  </div>
+
+  <h2>The agents <span class="zh">· 智能体</span></h2>
+  <p class="section-note">
+    <span class="en">Verdict on "is it over-built?": the shape is right. Each agent that reasons and loops earns its place; the borderline ones are closer to tool calls, but keeping them in the graph is fine.</span>
+    <span class="zh">关于"是否过度设计"的结论：架构的<em>形态</em>是对的。每个会推理、会循环的智能体都站得住脚；"边界型"的更接近一次工具调用，但保留在图里也没问题。</span>
+  </p>
+  <div class="agents">
+    <div class="agent">
+      <div class="name">Supervisor <span class="zh">主管</span></div>
+      <div class="job">
+        <span class="en">Plans steps, routes to agents, merges results. Step + cost caps.</span>
+        <span class="zh">规划步骤、分派给各智能体、汇总结果。带步数与成本上限。</span>
+      </div>
+      <span class="tag real">Real agent 真智能体</span>
+    </div>
+    <div class="agent">
+      <div class="name">Filings Researcher <span class="zh">文件研究员</span></div>
+      <div class="job">
+        <span class="en">Answers from 10-K / 20-F text with citations; re-queries if unsatisfied.</span>
+        <span class="zh">从 10-K / 20-F 正文中带引用地作答；不满意就重新检索。</span>
+      </div>
+      <span class="tag real">Real agent 真智能体</span>
+    </div>
+    <div class="agent">
+      <div class="name">Financial Analyst <span class="zh">财务分析员</span></div>
+      <div class="job">
+        <span class="en">Revenue, R&amp;D, margins, growth — and reasons over the numbers it fetches.</span>
+        <span class="zh">营收、研发、利润率、增长 —— 并对取到的数字进行推理分析。</span>
+      </div>
+      <span class="tag border">Borderline 边界型</span>
+    </div>
+    <div class="agent">
+      <div class="name">Profile Matcher <span class="zh">视角匹配器</span></div>
+      <div class="job">
+        <span class="en">Applies the lens: a fit score with reasons, judged against a rubric.</span>
+        <span class="zh">应用视角：按评分标准给出带理由的匹配分数。</span>
+      </div>
+      <span class="tag real">Real agent 真智能体</span>
+    </div>
+    <div class="agent">
+      <div class="name">Writer <span class="zh">撰写员</span></div>
+      <div class="job">
+        <span class="en">Assembles the brief from structured inputs. Usually a single pass.</span>
+        <span class="zh">把结构化输入组装成研究简报。通常一次成文。</span>
+      </div>
+      <span class="tag border">Borderline 边界型</span>
+    </div>
+    <div class="agent">
+      <div class="name">Verifier <span class="zh">校验员 · phase 2</span></div>
+      <div class="job">
+        <span class="en">Checks each claim against its source, blocks unsupported ones. Must stay independent of the Writer.</span>
+        <span class="zh">逐条核对结论与来源，拦截无依据的说法。必须独立于撰写员。</span>
+      </div>
+      <span class="tag p2">Phase 2 第二阶段</span>
+    </div>
+  </div>
+
+  <h2>Decisions <span class="zh">· 决策记录</span></h2>
+  <p class="section-note">
+    <span class="en">Each card is a choice we faced, the options with trade-offs, what we picked, and the reason. Click to expand.</span>
+    <span class="zh">每张卡片是我们面对的一个选择：备选方案及取舍、最终选择、以及原因。点击展开。</span>
+  </p>
+  <div class="filter" role="group" aria-label="Filter decisions">
+    <button data-filter="all" aria-pressed="true">All 全部</button>
+    <button data-filter="decided" aria-pressed="false">Decided 已定</button>
+    <button data-filter="open" aria-pressed="false">Open 待定</button>
+  </div>
+
+  <div class="ledger">
+
+    <details class="card" data-status="decided" open>
+      <summary>
+        <span class="did">D1</span>
+        <span class="title">Keep the multi-agent architecture<span class="zh">保留多智能体架构</span></span>
+        <span class="status decided">Decided 已定</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en">Is it over-built? No — the shape is right.</span>
+          <span class="zh">过度设计了吗？没有 —— 形态是对的。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Context 背景</h4>
+        <p>
+          <span class="en">Concern that four-plus agents, hybrid retrieval, a reranker, Langfuse and Ragas might be more machinery than Phase 1 needs.</span>
+          <span class="zh">担心四个以上的智能体、混合检索、重排序器、Langfuse、Ragas 对第一阶段来说机器太多、过度工程。</span>
+        </p>
+        <h4>Resolution 结论</h4>
+        <p>
+          <span class="en">Keep every agent. The design is right-<em>shaped</em>: each agent needs different tools and context, and the Verifier must be independent of the Writer. Supervisor, Researcher, Matcher and Verifier genuinely reason and loop. Analyst and Writer are closer to tool calls, but keeping them as graph nodes is fine.</span>
+          <span class="zh">保留全部智能体。设计的<em>形态</em>是对的：每个智能体需要不同的工具与上下文，而校验员必须独立于撰写员。主管、研究员、匹配器、校验员是真正在推理和循环的。分析员和撰写员更接近一次工具调用，但作为图节点保留没问题。</span>
+        </p>
+        <div class="why">
+          <strong>Why 为什么.</strong>
+          <span class="en">"Over-built" here is about <em>timing</em>, not shape — the risk is building all the surface area before anything runs end to end. The milestone order (ingest → retrieval → agents → matcher → eval) already mitigates that. The goal of relying on agents to analyze and do different jobs is legitimate and preserved.</span>
+          <span class="zh">这里的"过度"是<em>时机</em>问题，不是形态问题 —— 风险在于还没跑通端到端就铺开太多工作面。里程碑顺序（采集→检索→智能体→匹配→评估）已经缓解了这一点。"靠智能体来分析、各司其职"这个目标是合理的，并且被保留了下来。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" data-status="decided">
+      <summary>
+        <span class="did">D2</span>
+        <span class="title">How the Financial Analyst fetches numbers<span class="zh">财务分析员如何取数字</span></span>
+        <span class="status decided">Decided → C 已定</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en">Hybrid: safe tools for core metrics, SQL fallback for the rest.</span>
+          <span class="zh">混合：核心指标走安全工具，其余用 SQL 兜底。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Context 背景</h4>
+        <p>
+          <span class="en">The Analyst needs figures out of Postgres. How it gets them decides whether the financial numbers are trustworthy. XBRL is messy — one filer calls revenue <code>Revenues</code>, another <code>RevenueFromContractWithCustomerExcludingAssessedTax</code>, plus restatements and duplicate rows.</span>
+          <span class="zh">分析员需要从 Postgres 取数字。取数的方式决定了财务数据是否可信。XBRL 很乱 —— 有的公司营收字段叫 <code>Revenues</code>，有的叫 <code>RevenueFromContractWithCustomerExcludingAssessedTax</code>，还有财报重述和重复行。</span>
+        </p>
+        <h4>Options considered 备选方案</h4>
+        <div class="options">
+          <div class="opt">
+            <div class="oh"><span class="ol">A · Free-form text-to-SQL 自由生成 SQL</span></div>
+            <div class="pc">
+              <span class="pro">Flexible — answers questions you never anticipated. 灵活，能答预料之外的问题。</span>
+              <span class="con">LLM often writes SQL that runs fine but returns the wrong number — the worst failure for a cited, trust-first brief. LLM 常写出"能跑但取错数"的 SQL —— 对信任优先的带引用简报是最糟的失败。</span>
+            </div>
+          </div>
+          <div class="opt">
+            <div class="oh"><span class="ol">B · Parameterized query tools 参数化查询工具</span></div>
+            <div class="pc">
+              <span class="pro">Safe and reliable; XBRL normalization lives in tested Python. 安全可靠；XBRL 规整逻辑放在经过测试的 Python 里。</span>
+              <span class="pro">Exact-match eval becomes meaningful; still a real agent (reasons over results). 精确匹配评估才有意义；它仍是真智能体（对结果做推理）。</span>
+              <span class="con">Only answers questions the functions support. 只能回答函数支持的问题。</span>
+            </div>
+          </div>
+          <div class="opt chosen">
+            <div class="oh"><span class="ol">C · Hybrid 混合</span><span class="badge">Chosen 已选</span></div>
+            <div class="pc">
+              <span class="pro">Parameterized tools for core metrics (revenue, R&amp;D, margins — the eval set). 核心指标（营收、研发、利润率 —— 即评估集）走参数化工具。</span>
+              <span class="pro">Text-to-SQL kept as a fallback for unusual open-ended questions. 开放式冷门问题用 text-to-SQL 兜底。</span>
+              <span class="note">Best of both; a little more to build than B alone. 两者兼得；比只做 B 多一点工作量。</span>
+            </div>
+          </div>
+        </div>
+        <div class="why">
+          <strong>Why C 为什么选 C.</strong>
+          <span class="en">Keeps the Analyst a real reasoning agent while moving the error-prone part out of the LLM for the figures that matter most. Protects the cited financials and keeps the golden-set exact-match eval meaningful. <strong>Built at Milestone 3</strong> (<code>tools/sql_tools.py</code>), not now.</span>
+          <span class="zh">让分析员保持为真正会推理的智能体，同时把最关键数字的"易错部分"从 LLM 手里拿走。保护带引用的财务数据，并让标准答案集的精确匹配评估仍然有意义。<strong>在里程碑 3 实现</strong>（<code>tools/sql_tools.py</code>），现在还不做。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" data-status="open">
+      <summary>
+        <span class="did">D3</span>
+        <span class="title">Embedding model &amp; pgvector dimension<span class="zh">嵌入模型与向量维度</span></span>
+        <span class="status open">Open 待定</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en">Fixes the schema column; decide before Milestone 2.</span>
+          <span class="zh">它决定了表结构的列；需在里程碑 2 前定下。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Context 背景</h4>
+        <p>
+          <span class="en">The schema hardcodes <code>embedding vector(1536)</code>. The embedding model sets that number, so it should be chosen before the chunking/embedding work starts.</span>
+          <span class="zh">表结构里写死了 <code>embedding vector(1536)</code>。这个维度由嵌入模型决定，所以应在切块/嵌入工作开始前选好。</span>
+        </p>
+        <h4>Options on the table 备选</h4>
+        <div class="options">
+          <div class="opt">
+            <div class="oh"><span class="ol">OpenAI text-embedding-3-small</span></div>
+            <div class="pc"><span class="note">1536 dims — matches the schema. Cheap, good, needs an API key. 1536 维，与现有表结构一致。便宜、够用，需要 API key。</span></div>
+          </div>
+          <div class="opt">
+            <div class="oh"><span class="ol">OpenAI text-embedding-3-large</span></div>
+            <div class="pc"><span class="note">3072 dims — higher quality and cost; schema changes. 3072 维，质量与成本更高；需改表结构。</span></div>
+          </div>
+          <div class="opt">
+            <div class="oh"><span class="ol">Local / open (bge) 本地开源</span></div>
+            <div class="pc"><span class="note">No per-call cost, but needs torch and a model download; dimension varies. 无单次调用费用，但需 torch 和下载模型；维度随模型而定。</span></div>
+          </div>
+        </div>
+        <div class="why">
+          <strong>Status 状态.</strong>
+          <span class="en">Awaiting your call. No blocker until Milestone 2.</span>
+          <span class="zh">等你决定。里程碑 2 之前不构成阻塞。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" data-status="open">
+      <summary>
+        <span class="did">D4</span>
+        <span class="title">Public repo name<span class="zh">公开仓库命名</span></span>
+        <span class="status open">Open 待定</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en"><code>company-intel</code> vs <code>intel-agent</code>.</span>
+          <span class="zh"><code>company-intel</code> 还是 <code>intel-agent</code>。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Context 背景</h4>
+        <p>
+          <span class="en">The scope doc names the public repo <code>github.com/HSanny/company-intel</code>, but this working repo is <code>hsanny/intel-agent</code>.</span>
+          <span class="zh">方案文档把公开仓库写作 <code>github.com/HSanny/company-intel</code>，但当前工作仓库是 <code>hsanny/intel-agent</code>。</span>
+        </p>
+        <div class="why">
+          <strong>Status 状态.</strong>
+          <span class="en">Settle before the README and the CV link point anywhere. Low urgency, easy to change now, annoying to change later.</span>
+          <span class="zh">在 README 和简历链接定下指向前先确定。不紧急，现在改容易，以后改麻烦。</span>
+        </div>
+      </div>
+    </details>
+
+  </div>
+
+  <footer>
+    Company Intel · Phase 1 decision log 第一阶段决策记录 · maintained as we build 随开发持续更新 · last updated 5 Nov 2026
+  </footer>
+</div>
+
+<script>
+  (function () {
+    var buttons = Array.prototype.slice.call(document.querySelectorAll(".filter button"));
+    var cards = Array.prototype.slice.call(document.querySelectorAll(".ledger details"));
+    var ledger = document.querySelector(".ledger");
+
+    function apply(filter) {
+      cards.forEach(function (c) {
+        var show = filter === "all" || c.getAttribute("data-status") === filter;
+        c.hidden = !show;
+      });
+      var anyVisible = cards.some(function (c) { return !c.hidden; });
+      var existing = ledger.querySelector(".empty");
+      if (existing) existing.remove();
+      if (!anyVisible) {
+        var p = document.createElement("p");
+        p.className = "empty";
+        p.textContent = "No decisions in this view yet. 此视图下暂无决策。";
+        ledger.appendChild(p);
+      }
+    }
+
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        buttons.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+        b.setAttribute("aria-pressed", "true");
+        apply(b.getAttribute("data-filter"));
+      });
+    });
+  })();
+</script>
