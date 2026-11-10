@@ -223,6 +223,8 @@
 
   /* ---- decision cards ---- */
   .ledger { display: grid; gap: 14px; }
+  .learn { display: grid; gap: 14px; }
+  .status.tech { background: var(--accent-soft); color: var(--accent); }
   details.card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -356,14 +358,14 @@
       <span>Started 开始 <b>3 Nov 2026</b></span>
       <span>Updated 更新 <b>5 Nov 2026</b></span>
       <span>Phase 阶段 <b>1 / 3</b></span>
-      <span>Code 代码: <b>M1 built · tests green M1已完成·测试通过</b></span>
+      <span>Code 代码: <b>M1–M2 built · 15 tests green M1–M2已完成·15项测试通过</b></span>
     </div>
   </header>
 
   <h2>Where we are <span class="zh">· 当前进度</span></h2>
   <p class="section-note">
-    <span class="en">Milestone 1 is built and unit-tested: a polite SEC client, XBRL → Postgres, 10-K/20-F section extraction, and a CLI (<code>init-db</code> / <code>ingest</code> / <code>facts</code>). Milestone 2 (hybrid retrieval) is next. Agents and LangGraph still arrive at Milestone 3.</span>
-    <span class="zh">里程碑 1 已完成并通过单元测试：礼貌的 SEC 客户端、XBRL → Postgres、10-K/20-F 章节抽取，以及 CLI（<code>init-db</code> / <code>ingest</code> / <code>facts</code>）。下一步是里程碑 2（混合检索）。智能体与 LangGraph 仍在里程碑 3 出现。</span>
+    <span class="en"><b>Milestones 1–2 are built and unit-tested.</b> Today this is a usable <b>command-line retrieval tool</b> — you can ingest SEC data and search filings for cited passages (<code>ingest</code> / <code>facts</code> / <code>embed</code> / <code>search</code>). It is <b>not yet an agent</b>: there's no LLM reasoning or orchestration. The agents (LangGraph supervisor, researcher, analyst, writer) arrive at Milestone 3. To actually run embeddings you'll install torch + download the model locally (this cloud box runs the unit tests, not the live model).</span>
+    <span class="zh"><b>里程碑 1–2 已完成并通过单元测试。</b>现在它是一个可用的<b>命令行检索工具</b> —— 你可以采集 SEC 数据、检索文件并得到带引用的段落（<code>ingest</code> / <code>facts</code> / <code>embed</code> / <code>search</code>）。它<b>还不是 agent</b>：没有 LLM 推理或编排。智能体（LangGraph 主管、研究员、分析员、撰写员）在里程碑 3 出现。真正运行嵌入需本地安装 torch 并下载模型（此云端只跑单元测试，不跑实际模型）。</span>
   </p>
   <div class="stepper">
     <div class="step done">
@@ -371,15 +373,15 @@
       <div class="t">Ingest &amp; store <span class="zh">采集与入库</span></div>
       <div class="s">✓ Built 已完成</div>
     </div>
-    <div class="step current">
+    <div class="step done">
       <div class="m">M2</div>
       <div class="t">Hybrid retrieval <span class="zh">混合检索</span></div>
-      <div class="s"><span class="dot">●</span> Next 下一步</div>
+      <div class="s">✓ Built 已完成</div>
     </div>
-    <div class="step">
+    <div class="step current">
       <div class="m">M3</div>
       <div class="t">Agents + LangGraph <span class="zh">智能体编排</span></div>
-      <div class="s">Planned 计划中</div>
+      <div class="s"><span class="dot">●</span> Next 下一步</div>
     </div>
     <div class="step">
       <div class="m">M4</div>
@@ -563,15 +565,15 @@
       </div>
     </details>
 
-    <details class="card" data-status="open">
+    <details class="card" data-status="decided">
       <summary>
         <span class="did">D3</span>
         <span class="title">Embedding model &amp; pgvector dimension<span class="zh">嵌入模型与向量维度</span></span>
-        <span class="status open">Open 待定</span>
+        <span class="status decided">Decided 已定</span>
         <span class="chev">▶</span>
         <span class="sub">
-          <span class="en">Fixes the schema column; decide before Milestone 2.</span>
-          <span class="zh">它决定了表结构的列；需在里程碑 2 前定下。</span>
+          <span class="en">Local bge-small-en-v1.5 / 384, swappable; fine-tune later.</span>
+          <span class="zh">本地 bge-small-en-v1.5 / 384，可替换；后续微调。</span>
         </span>
       </summary>
       <div class="body">
@@ -590,15 +592,15 @@
             <div class="oh"><span class="ol">OpenAI text-embedding-3-large</span></div>
             <div class="pc"><span class="note">3072 dims — higher quality and cost; schema changes. 3072 维，质量与成本更高；需改表结构。</span></div>
           </div>
-          <div class="opt">
-            <div class="oh"><span class="ol">Local / open (bge) 本地开源</span></div>
-            <div class="pc"><span class="note">No per-call cost, but needs torch and a model download; dimension varies. 无单次调用费用，但需 torch 和下载模型；维度随模型而定。</span></div>
+          <div class="opt chosen">
+            <div class="oh"><span class="ol">Local / open (bge) 本地开源</span><span class="badge">Chosen 已选</span></div>
+            <div class="pc"><span class="note">bge-small-en-v1.5, 384-dim. Hands-on, offline, free per call; needs torch + model download; slower on CPU. bge-small-en-v1.5，384 维。动手、离线、无调用费；需 torch 与下载模型；CPU 较慢。</span></div>
           </div>
         </div>
         <div class="why">
-          <strong>Status 状态.</strong>
-          <span class="en">Deferred to Milestone 2. M1 ships without the <code>chunks</code> table (commented in <code>schema.sql</code>); config keeps <code>text-embedding-3-small</code> / 1536 as placeholders. Still your call before M2.</span>
-          <span class="zh">延后到里程碑 2。M1 不建 <code>chunks</code> 表（在 <code>schema.sql</code> 中以注释保留）；配置以 <code>text-embedding-3-small</code> / 1536 作占位。M2 前仍需你定夺。</span>
+          <strong>Decision 决定.</strong>
+          <span class="en">Local <code>bge-small-en-v1.5</code> (384-dim) via sentence-transformers, behind a swappable <code>EmbeddingProvider</code> interface (OpenAI kept as an alternate). Chosen for hands-on learning and a later fine-tuning track. Changing the model later = swap provider + recreate the table at the new dimension + re-embed.</span>
+          <span class="zh">本地 <code>bge-small-en-v1.5</code>（384 维），经 sentence-transformers，藏在可替换的 <code>EmbeddingProvider</code> 接口后（OpenAI 作为备选）。为动手学习与后续微调track而选。以后换模型 = 换 provider + 按新维度重建表 + 重新嵌入。</span>
         </div>
       </div>
     </details>
@@ -653,10 +655,199 @@
       </div>
     </details>
 
+    <details class="card" data-status="decided">
+      <summary>
+        <span class="did">D6</span>
+        <span class="title">Lexical (BM25) ranker<span class="zh">词法（BM25）排序器</span></span>
+        <span class="status decided">Decided 已定</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en"><code>rank_bm25</code> — true BM25, fully inspectable.</span>
+          <span class="zh"><code>rank_bm25</code> —— 真正的 BM25，完全可见。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Context 背景</h4>
+        <p>
+          <span class="en">The hybrid search needs a keyword side alongside the dense vectors. Two ways to get BM25-style lexical ranking.</span>
+          <span class="zh">混合检索在稠密向量之外还需要一个关键词侧。获得 BM25 式词法排序有两种方式。</span>
+        </p>
+        <h4>Options considered 备选方案</h4>
+        <div class="options">
+          <div class="opt chosen">
+            <div class="oh"><span class="ol">rank_bm25</span><span class="badge">Chosen 已选</span></div>
+            <div class="pc">
+              <span class="pro">Pure-Python, <em>literally</em> BM25 — the TF/IDF math is visible. Great for learning. 纯 Python，<em>就是</em> BM25 —— TF/IDF 计算可见，适合学习。</span>
+              <span class="con">Builds the index in memory per query (fine for a tiny corpus, not for scale). 每次查询在内存建索引（小语料没问题，大规模不行）。</span>
+            </div>
+          </div>
+          <div class="opt">
+            <div class="oh"><span class="ol">Postgres full-text (ts_rank)</span></div>
+            <div class="pc">
+              <span class="note">In-DB, scales better, but <code>ts_rank</code> ≠ true BM25. Can swap in later. 在库内、更易扩展，但 <code>ts_rank</code> 不是真正的 BM25。以后可替换。</span>
+            </div>
+          </div>
+        </div>
+        <div class="why">
+          <strong>Why rank_bm25 为什么选它.</strong>
+          <span class="en">Transparency for the learning goal; the corpus is tiny so the in-memory cost is irrelevant. Swap to Postgres FTS or pg_search if scale ever matters.</span>
+          <span class="zh">为学习目标选择透明度；语料很小，内存成本无关紧要。将来需要扩展再换成 Postgres FTS 或 pg_search。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card" data-status="decided">
+      <summary>
+        <span class="did">D7</span>
+        <span class="title">Fine-tuning track<span class="zh">微调track</span></span>
+        <span class="status decided">Planned 已规划</span>
+        <span class="chev">▶</span>
+        <span class="sub">
+          <span class="en">A later milestone, after the eval harness exists.</span>
+          <span class="zh">评估框架就绪后的独立里程碑。</span>
+        </span>
+      </summary>
+      <div class="body">
+        <h4>Plan 计划</h4>
+        <p>
+          <span class="en">Fine-tune the bge embedder and/or the reranker on <code>query → relevant-passage</code> pairs generated from the golden set, then measure the lift with the eval. It comes <em>after</em> M5 because you need the eval to prove fine-tuning helps, and labeled pairs to train on.</span>
+          <span class="zh">用从标准答案集生成的 <code>查询 → 相关段落</code> 样本对，微调 bge 嵌入器和/或重排序器，再用评估衡量提升。它排在 M5 <em>之后</em>，因为需要评估来证明微调有效，也需要带标注的样本对来训练。</span>
+        </p>
+      </div>
+    </details>
+
+  </div>
+
+  <h2>How it's built <span class="zh">· 逐步构建与学习</span></h2>
+  <p class="section-note">
+    <span class="en">The Milestone 2 retrieval pipeline, step by step — what each part does, the trade-offs, and what we chose. A query flows top to bottom. Click a step to expand.</span>
+    <span class="zh">里程碑 2 的检索流水线，逐步讲解 —— 每一部分做什么、取舍、以及我们的选择。一次查询自上而下流动。点击展开。</span>
+  </p>
+  <div class="learn">
+
+    <details class="card" open>
+      <summary>
+        <span class="did">S1</span>
+        <span class="title">Chunking<span class="zh">切块</span></span>
+        <span class="status tech">word-window</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Split long filings into overlapping passages.</span><span class="zh">把长文件切成有重叠的段落。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">A 10-K is far too long to embed or read whole, so each item section is cut into ~400-word windows that overlap by 60 words. The overlap keeps a fact that straddles a boundary from being split away. Code: <code>ingest/chunk_embed.py</code>.</span><span class="zh">10-K 太长，无法整体嵌入或阅读，于是把每个条目章节切成约 400 词、相互重叠 60 词的窗口。重叠能避免跨边界的事实被切散。代码：<code>ingest/chunk_embed.py</code>。</span></p>
+        <h4>Trade-offs 取舍</h4>
+        <div class="pc">
+          <span class="pro">Simple, testable, predictable size. 简单、可测、大小可控。</span>
+          <span class="con">Can cut mid-sentence; word count only approximates tokens. 可能从句中切断；词数只是近似 token。</span>
+          <span class="note">Alternatives: sentence/semantic-aware (cleaner, more complex), token-exact via tiktoken. 备选：按句/语义（更干净、更复杂）、用 tiktoken 精确切 token。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S2</span>
+        <span class="title">Embeddings<span class="zh">嵌入</span></span>
+        <span class="status tech">bge-small · 384d</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Turn each passage into a 384-number meaning vector.</span><span class="zh">把每个段落变成 384 维的"含义"向量。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">An embedding model maps text to a vector so that similar meanings land near each other. We run <code>bge-small-en-v1.5</code> locally via sentence-transformers, normalize the vectors (so cosine similarity = dot product), and prepend a short instruction to <em>queries</em> (a bge convention that improves retrieval). Code: <code>embeddings/local_bge.py</code>.</span><span class="zh">嵌入模型把文本映射为向量，使含义相近的文本彼此靠近。我们用 sentence-transformers 在本地跑 <code>bge-small-en-v1.5</code>，对向量归一化（使余弦相似度=点积），并给<em>查询</em>加一句简短指令（bge 的惯例，可提升检索）。代码：<code>embeddings/local_bge.py</code>。</span></p>
+        <h4>Why local 为什么本地</h4>
+        <div class="pc">
+          <span class="pro">Hands-on, offline, no per-call cost; you see batching/pooling/vectors. 动手、离线、无调用费；能看到批处理/池化/向量。</span>
+          <span class="con">Needs torch + a model download; slower on CPU than an API. 需 torch 与下载模型；CPU 上比 API 慢。</span>
+          <span class="note">Swappable: <code>EmbeddingProvider</code> interface lets us A/B OpenAI or a fine-tuned model later. 可替换：<code>EmbeddingProvider</code> 接口便于以后对比 OpenAI 或微调模型。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S3</span>
+        <span class="title">Vector search<span class="zh">向量检索</span></span>
+        <span class="status tech">pgvector · HNSW</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Find passages whose meaning is nearest the query.</span><span class="zh">找出含义与查询最接近的段落。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">Vectors live in Postgres via the <code>pgvector</code> extension. A search embeds the query and finds the nearest chunks by cosine distance (the <code>&lt;=&gt;</code> operator); score = 1 − distance. An HNSW index makes this approximate-but-fast instead of scanning every row. Code: <code>store/db.py</code>, <code>retrieval/vector.py</code>.</span><span class="zh">向量通过 <code>pgvector</code> 扩展存在 Postgres 里。检索时先嵌入查询，再按余弦距离（<code>&lt;=&gt;</code> 运算符）找最近的分块；分数 = 1 − 距离。HNSW 索引让它"近似但快"，而不必扫描每一行。代码：<code>store/db.py</code>、<code>retrieval/vector.py</code>。</span></p>
+        <h4>Strength / limit 优点 / 局限</h4>
+        <div class="pc">
+          <span class="pro">Catches meaning and synonyms, not just exact words. 抓住含义与同义，不只是字面。</span>
+          <span class="con">Can miss exact terms — a ticker, a defined word, a number. 可能错过精确词 —— 代码、定义术语、数字。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S4</span>
+        <span class="title">BM25 keyword search<span class="zh">BM25 关键词检索</span></span>
+        <span class="status tech">rank_bm25</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Classic lexical ranking — the exact-word complement.</span><span class="zh">经典词法排序 —— 精确词的互补。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">BM25 scores a passage by how often the query's terms occur in it, weighted <em>down</em> for terms common across the whole corpus (inverse document frequency). So a rare, specific word counts for more than a common one. This catches the exact matches the dense model smooths over. Code: <code>retrieval/bm25.py</code>.</span><span class="zh">BM25 按查询词在段落中出现的频次打分，并对全语料中常见的词<em>降权</em>（逆文档频率）。因此稀有、具体的词比常见词更重要。这能抓住稠密模型会"抹平"的精确匹配。代码：<code>retrieval/bm25.py</code>。</span></p>
+        <h4>Decision 决策</h4>
+        <div class="pc">
+          <span class="note">D6: <code>rank_bm25</code> (true BM25, fully visible) over Postgres <code>ts_rank</code>. D6：选 <code>rank_bm25</code>（真正的 BM25、完全可见），而非 Postgres 的 <code>ts_rank</code>。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S5</span>
+        <span class="title">Hybrid fusion (RRF)<span class="zh">混合融合（RRF）</span></span>
+        <span class="status tech">RRF · k=60</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Merge the two rankings into one, fairly.</span><span class="zh">把两种排序公平地合成一个。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">Dense and BM25 each surface good-but-different results, and their raw scores live on different scales — so we can't just add them. Reciprocal Rank Fusion uses only the <em>rank</em> a passage got in each list: fused score = Σ 1 / (k + rank), with k=60. A passage that ranks well in <em>both</em> beats one that tops only a single list. Code: <code>retrieval/hybrid.py</code>.</span><span class="zh">稠密与 BM25 各自给出"好但不同"的结果，且原始分数量纲不同 —— 不能直接相加。倒数排名融合（RRF）只用段落在每个列表中的<em>名次</em>：融合分 = Σ 1 / (k + 名次)，k=60。在<em>两边</em>都靠前的段落，胜过只在一边第一的段落。代码：<code>retrieval/hybrid.py</code>。</span></p>
+        <h4>Why it's nice 妙处</h4>
+        <div class="pc">
+          <span class="pro">No score calibration needed; robust and simple; one pure function (unit-tested). 无需分数校准；稳健简单；一个纯函数（已单测）。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S6</span>
+        <span class="title">Reranking<span class="zh">重排序</span></span>
+        <span class="status tech">cross-encoder</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">A slower, sharper second pass over the top candidates.</span><span class="zh">对头部候选做更慢更准的二次排序。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">Retrieval uses a <em>bi-encoder</em>: query and passage are embedded separately, so the model never sees them together. A <em>cross-encoder</em> reads the (query, passage) pair jointly and scores relevance directly — more accurate, but too slow to run over everything. So we run it only on the top fused hits, to reorder them. Code: <code>retrieval/rerank.py</code> (<code>bge-reranker-base</code>, local; a Noop reranker is used in tests).</span><span class="zh">检索用的是<em>双编码器</em>：查询和段落分别嵌入，模型从不同时看它们。<em>交叉编码器</em>把（查询，段落）一起读入并直接给相关性打分 —— 更准，但太慢，不能对全部跑。因此只对头部融合结果重排。代码：<code>retrieval/rerank.py</code>（<code>bge-reranker-base</code>，本地；测试用空操作重排器）。</span></p>
+        <div class="pc">
+          <span class="note">This is also a natural thing to fine-tune later (see D7). 这也是以后适合微调的一环（见 D7）。</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="card">
+      <summary>
+        <span class="did">S7</span>
+        <span class="title">Citations<span class="zh">引用</span></span>
+        <span class="status tech">filing_search</span>
+        <span class="chev">▶</span>
+        <span class="sub"><span class="en">Every passage traces back to its exact filing + date.</span><span class="zh">每个段落都能追溯到具体文件与日期。</span></span>
+      </summary>
+      <div class="body">
+        <p><span class="en">Each chunk carries its <code>accession_no</code>, <code>item</code> and <code>chunk_idx</code>, joined to the company's ticker, form and filing date. The <code>filing_search</code> tool returns every passage wrapped in a <code>Citation</code>, so the Researcher agent (M3) — and you — can trace each claim to the exact filing section and date. This is what makes the system trust-first. Code: <code>tools/filing_search.py</code>.</span><span class="zh">每个分块都带着自己的 <code>accession_no</code>、<code>item</code>、<code>chunk_idx</code>，并关联到公司的代码、表单和提交日期。<code>filing_search</code> 工具把每个段落包进一个 <code>Citation</code> 返回，于是研究员 agent（M3）—— 以及你 —— 都能把每条结论追溯到具体的文件章节与日期。这正是系统"信任优先"的根基。代码：<code>tools/filing_search.py</code>。</span></p>
+      </div>
+    </details>
+
   </div>
 
   <footer>
-    Company Intel · Phase 1 decision log 第一阶段决策记录 · maintained as we build 随开发持续更新 · last updated 5 Nov 2026
+    Company Intel · Phase 1 decision log 第一阶段决策记录 · maintained as we build 随开发持续更新 · last updated 10 Nov 2026
   </footer>
 </div>
 

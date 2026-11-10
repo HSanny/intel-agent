@@ -54,14 +54,19 @@ GRANT USAGE ON SCHEMA public TO intel_ro;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO intel_ro;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO intel_ro;
 
--- Milestone 2 (blocked on Decision D3 — the embedding model sets the vector
--- dimension). Uncomment and set the dimension once D3 is decided:
---
--- CREATE TABLE IF NOT EXISTS chunks (
---     id           BIGSERIAL PRIMARY KEY,
---     accession_no TEXT REFERENCES filings (accession_no),
---     item         TEXT,
---     chunk_idx    INT,
---     text         TEXT,
---     embedding    vector(1536)
--- );
+-- Chunks for retrieval (Milestone 2). Decision D3: embeddings are
+-- bge-small-en-v1.5 -> 384 dimensions. Changing the embedding model means
+-- changing this dimension and re-embedding. The lexical (BM25) side is built
+-- in Python (rank_bm25, Decision D6), so no full-text column is needed here.
+CREATE TABLE IF NOT EXISTS chunks (
+    id           BIGSERIAL PRIMARY KEY,
+    accession_no TEXT REFERENCES filings (accession_no),
+    item         TEXT,
+    chunk_idx    INT,
+    text         TEXT NOT NULL,
+    embedding    vector(384)
+);
+-- Approximate-nearest-neighbour index for cosine similarity search.
+CREATE INDEX IF NOT EXISTS idx_chunks_embedding
+    ON chunks USING hnsw (embedding vector_cosine_ops);
+CREATE INDEX IF NOT EXISTS idx_chunks_accession ON chunks (accession_no);

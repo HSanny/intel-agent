@@ -5,8 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 
 import psycopg
+from pgvector.psycopg import register_vector
 from psycopg.rows import dict_row
 
+from ..ingest.chunk_embed import Chunk
 from ..ingest.filings import Section
 from ..ingest.sec_client import Filing
 from ..ingest.xbrl import Fact
@@ -134,3 +136,84 @@ class DB:
 
         ordered = sorted(by_year.values(), key=lambda r: r["fiscal_year"], reverse=True)
         return ordered[:years]
+
+    # ------------------------------------------------------------------ #
+    # Milestone 2: chunks + retrieval
+    # ------------------------------------------------------------------ #
+    def get_sections(self, accession_no: str) -> list[Section]:
+        with psycopg.connect(self.dsn, row_factory=dict_row) as conn:
+            rows = conn.execute(
+                "SELECT accession_no, item, text FROM filing_sections "
+                "WHERE accession_no = %s ORDER BY id",
+                (accession_no,),
+            ).fetchall()
+        return [Section(**row) for row in rows]
+
+    def accessions_for_ticker(self, ticker: str) -> list[str]:
+        with psycopg.connect(self.dsn) as conn:
+            rows = conn.execute(
+                "SELECT f.accession_no FROM filings f "
+                "JOIN companies c ON c.cik = f.cik "
+                "WHERE c.ticker = %s ORDER BY f.filed_date DESC",
+                (ticker.upper(),),
+            ).fetchall()
+        return [row[0] for row in rows]
+
+    def insert_chunks(
+        self, chunks: list[Chunk], embeddings: list[list[float]]
+    ) -> None:
+        if not chunks:
+            return
+        accessions = {c.accession_no for c in chunks}
+        with psycopg.connect(self.dsn) as conn:
+            register_vector(conn)
+            for accession in accessions:
+                conn.execute("DELETE FROM chunks WHERE accession_no = %s", (accession,))
+            conn.cursor().executemany(
+                "INSERT INTO chunks (accession_no, item, chunk_idx, text, embedding) "
+                "VALUES (%s, %s, %s, %s, %s)",
+                [
+                    (c.accession_no, c.item, c.chunk_idx, c.text, embedding)
+                    for c, embedding in zip(chunks, embeddings, strict=True)
+                ],
+            )
+
+    def fetch_chunks(self, ticker: str | None = None) -> list[dict]:
+        """Return chunk rows (with citation metadata) for the BM25 index."""
+        where = "WHERE c.ticker = %s" if ticker else ""
+        params = (ticker.upper(),) if ticker else ()
+        with psycopg.connect(self.dsn, row_factory=dict_row) as conn:
+            return conn.execute(
+                f"""
+                SELECT ch.id, ch.accession_no, ch.item, ch.chunk_idx, ch.text,
+                       c.ticker, f.form, f.filed_date
+                FROM chunks ch
+                JOIN filings f ON f.accession_no = ch.accession_no
+                JOIN companies c ON c.cik = f.cik
+                {where}
+                """,
+                params,
+            ).fetchall()
+
+    def vector_search(
+        self, embedding: list[float], k: int = 20, ticker: str | None = None
+    ) -> list[dict]:
+        """Return the k nearest chunks by cosine similarity (score = 1 - distance)."""
+        where = "WHERE c.ticker = %s" if ticker else ""
+        meta_params: tuple = (ticker.upper(),) if ticker else ()
+        with psycopg.connect(self.dsn, row_factory=dict_row) as conn:
+            register_vector(conn)
+            return conn.execute(
+                f"""
+                SELECT ch.id, ch.accession_no, ch.item, ch.chunk_idx, ch.text,
+                       c.ticker, f.form, f.filed_date,
+                       1 - (ch.embedding <=> %s) AS score
+                FROM chunks ch
+                JOIN filings f ON f.accession_no = ch.accession_no
+                JOIN companies c ON c.cik = f.cik
+                {where}
+                ORDER BY ch.embedding <=> %s
+                LIMIT %s
+                """,
+                (embedding, *meta_params, embedding, k),
+            ).fetchall()

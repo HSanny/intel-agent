@@ -33,9 +33,19 @@ class Settings(BaseSettings):
     # Requests per second to SEC (kept under the 10 req/s limit).
     sec_rate_limit: float = 8.0
 
-    # Milestone 2 placeholders (Decision D3).
-    embedding_model: str = "text-embedding-3-small"
-    embedding_dim: int = 1536
+    # Embeddings (Decision D3: local bge-small-en-v1.5, 384-dim, swappable).
+    embedding_provider: str = "local_bge"  # "local_bge" | "openai"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_dim: int = 384
+    embed_batch_size: int = 32
+
+    # Chunking (word-based sliding window).
+    chunk_target_words: int = 400
+    chunk_overlap_words: int = 60
+
+    # Reranking (local cross-encoder).
+    rerank_enabled: bool = True
+    rerank_model: str = "BAAI/bge-reranker-base"
 
 
 @lru_cache

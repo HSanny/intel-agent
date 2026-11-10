@@ -10,9 +10,15 @@ and milestone progress. · 设计决策与里程碑进度见 `docs/decision-log.
 
 ## Status · 状态
 
-**Milestone 1 — SEC ingest.** Pulls filings and XBRL financials for seed
-companies into Postgres. No agents yet (those arrive at Milestone 3).
-**里程碑 1 —— SEC 数据采集。** 将种子公司的文件与 XBRL 财务数据采集进 Postgres。暂无智能体（里程碑 3 才加入）。
+**Milestones 1–2 built.** Today this is a usable **command-line retrieval tool**:
+ingest SEC filings + financials, then search filings for cited passages via a
+local-embedding hybrid (vector + BM25) pipeline with reranking. It is **not yet
+an agent** — no LLM reasoning/orchestration. Agents (LangGraph supervisor,
+researcher, analyst, writer) arrive at Milestone 3.
+**里程碑 1–2 已完成。** 现在它是一个可用的**命令行检索工具**：采集 SEC 文件与财务数据，再通过本地嵌入的混合（向量 + BM25）+ 重排序流水线检索文件并返回带引用的段落。它**还不是 agent** —— 没有 LLM 推理/编排。智能体（里程碑 3 加入）。
+
+See the step-by-step **"How it's built"** section in
+[`docs/decision-log.html`](docs/decision-log.html). · 逐步技术讲解见决策记录。
 
 ## Quickstart · 快速上手
 
@@ -23,7 +29,12 @@ docker compose up -d          # start Postgres 16 + pgvector
 company-intel init-db         # create tables and the read-only role
 company-intel ingest STX MU GRAB SE   # ingest filings + financials
 company-intel facts STX       # print the last 3 fiscal years of revenue & R&D
+company-intel embed STX MU GRAB SE    # chunk + embed filings (first run downloads the model)
+company-intel search "main risk factors" --ticker STX   # cited passages
 ```
+
+The first `embed`/`search` downloads the local embedding + reranker models from
+Hugging Face (needs network access). · 首次 `embed`/`search` 会从 Hugging Face 下载本地嵌入与重排序模型（需联网）。
 
 Run the tests with `pytest` (no database required — HTTP is mocked and parsing
 uses fixtures). · 运行测试：`pytest`（无需数据库，HTTP 已 mock，解析使用 fixtures）。
